@@ -3,6 +3,8 @@
     #include <math.h>
     // include lex.yy.h??????????//////
     #include "lex.yy.h"
+    #include "errors.h"
+    void yyerror (char const *);
 %}
 
 %token NUM
@@ -35,3 +37,8 @@ exp:
    ;
 
 %%
+
+void yyerror (char const *s) {
+    printf("s: %s\n", s);
+    printErrorLine(ERR_SYNTAX, 0);
+}

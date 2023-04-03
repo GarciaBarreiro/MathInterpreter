@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "syn.tab.h"
+
 #define MAX_LENGTH 1024
 
 int main(int argc, char *argv[]) {

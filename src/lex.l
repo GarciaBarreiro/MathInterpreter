@@ -14,8 +14,8 @@ int num_lines = 0;
 %x NESTED_COMMENT
 
 DEC             [0-9][0-9_]*(\.[0-9_]*)?([eE][\+\-]?[0-9_]*)?
-BIN             0[bB][01_]*
-HEX             0[xX][0-9a-fA-F_]*
+BIN             0[bB][01][01_]*
+HEX             0[xX][0-9a-fA-F][0-9a-fA-F_]*
 LINE_COMMENT    \/\/.*
 ID              [a-zA-Z_][a-zA-Z_0-9]*
 STRING          \"([^(\\\")]|(\\\"))*\"
@@ -25,15 +25,15 @@ NEWLINE         \n
 %%
 
 {DEC}  {
-    return(D_DEC_NUM);
+    return(M_DEC_NUM);
 }
 
 {BIN}  {
-    return(D_BIN_NUM);
+    return(M_BIN_NUM);
 }
 
 {HEX}  {
-    return(D_HEX_NUM);
+    return(M_HEX_NUM);
 }
 
 {LINE_COMMENT}  ;
@@ -71,35 +71,35 @@ NEWLINE         \n
 }
 
 "=="    {
-    return(D_EQUALS);
+    return(M_EQUALS);
 }
 
 "!="    {
-    return(D_NOT_EQUALS);
+    return(M_NOT_EQUALS);
 }
 
 "+="    {
-    return(D_PLUS_EQUALS);
+    return(M_PLUS_EQUALS);
 }
 
 "++"    {
-    return(D_PLUS_PLUS);
+    return(M_PLUS_PLUS);
 }
 
 "-="    {
-    return(D_MINUS_EQUALS);
+    return(M_MINUS_EQUALS);
 }
 
 "--"    {
-    return(D_MINUS_MINUS);
+    return(M_MINUS_MINUS);
 }
 
 {ID}    {
-    return(D_ID);
+    return(M_ID);
 }
 
 {STRING}    {
-    return(D_STR);
+    return(M_STR);
 }
 
 {NEWLINE}   {

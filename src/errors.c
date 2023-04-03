@@ -43,5 +43,7 @@ void printErrorLine(int error, int line_number) {
         case ERR_NESTED_COMMENT:
             fprintf(stderr, "LEXICAL ERROR: Nested comment not closed at line %d\n", line_number);
             break;
+        case ERR_SYNTAX:
+            fprintf(stderr, "SYNTAX ERROR: TODO\n");
     }
 }
