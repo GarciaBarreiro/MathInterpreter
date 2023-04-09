@@ -8,7 +8,7 @@ OUTPUT = dLexicalAnalyzer
 
 LIB_HEADERS = lex.yy.h syn.tab.h defs.h errors.h tree.h
 
-SRCS = src/lex.yy.c src/syn.tab.h src/main.c src/errors.c src/tree.c
+SRCS = src/lex.yy.c src/syn.tab.c src/main.c src/errors.c src/tree.c
 
 OBJS = $(SRCS:.c=.o)
 
@@ -26,6 +26,7 @@ $(OUTPUT): $(OBJS)
 	$(CC) -o $(OUTPUT) $(OBJS)
 	rm src/*.o
 	rm -f src/lex.yy.*
+	rm -f src/syn.tab.*
 
 %.o: %.c $(LIB_HEADERS)
 	$(CC) -c -o $@ $< $(INCLUDES)
@@ -34,4 +35,6 @@ cleanall: clean
 	rm -f $(OUTPUT)
 
 clean:
-	rm -f *.o *~
+	rm -f src/*.o *~
+	rm -f src/lex.yy.*
+	rm -f src/syn.tab.*
