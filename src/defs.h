@@ -17,8 +17,10 @@
 #define MA_BIN_NUM 751
 #define MA_HEX_NUM 752
 
+#define MA_EOF 800
+
 // strings
-#define MA_STR 800
+#define MA_STR 850
 
 #define MA_PI 3.14159
 #define MA_E  2.71828

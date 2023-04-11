@@ -5,8 +5,8 @@
 
 void printError(int error) {
     switch (error) {
-        case ERR_NO_ARGS:
-            fprintf(stderr, "ERROR: No arguments passed\n");
+        case ERR_BAD_ARGS:
+            fprintf(stderr, "ERROR: Bad arguments passed\n");
             fprintf(stderr, "       Use `-h` for help\n");
             exit(1);
             break;

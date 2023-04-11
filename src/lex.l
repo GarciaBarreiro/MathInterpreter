@@ -98,6 +98,7 @@ SPACE           [ \t]+
 }
 
 {ID}    {
+    yylval.lex = strdup(yytext);
     return(MA_ID);
 }
 
@@ -122,11 +123,15 @@ SPACE           [ \t]+
     else if (YYSTATE == NESTED_COMMENT)
         printErrorLine(ERR_NESTED_COMMENT, num_lines);
 
-    yy_delete_buffer(YY_CURRENT_BUFFER);
+    //yy_delete_buffer(YY_CURRENT_BUFFER);
     fclose(yyin);
-    yylex_destroy();
-    yy_init = 1;
-    return EOF;
+
+    yyrestart(stdin);
+
+    /* TODO: CALL LATER FROM syn.y*/
+    /*yylex_destroy();
+    yy_init = 1;*/
+    return MA_EOF;
 }
 
 %%

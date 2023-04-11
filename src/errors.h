@@ -1,8 +1,8 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-#define ERR_NO_ARGS 0       // no args passed
-#define ERR_NO_INPUT 1      // no input passed
+#define ERR_BAD_ARGS 0      // bad args passed
+#define ERR_NO_INPUT 1      // no input passed // NOT NEEDED
 #define ERR_BAD_FILE 2      // can't open file
 #define ERR_BAD_EXTENSION 3 // bad file extension
 #define ERR_BAD_MALLOC 4    // failed `malloc` (exits)

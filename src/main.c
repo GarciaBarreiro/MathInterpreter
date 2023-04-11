@@ -6,45 +6,57 @@
 #include "lex.yy.h"
 #include "syn.tab.h"
 
+#include "errors.h"
+
 #define MAX_LENGTH 1024
 
+void _printHelp() {
+    printf("Usage:\n"
+        "    ./mathA [-i file] [-o file]\n\n"
+        "Options:\n"
+        "    -h        Shows this screen\n"
+        "    -i FILE   Reads input from FILE\n"
+        "    -o FILE   Saves output to FILE\n");
+}
+
 int main(int argc, char *argv[]) {
-    char input_buf[MAX_LENGTH];
-    /*
     char c;
-    short oflag = 0;
+    short oflag = 0, iflag = 0;
     char *input = NULL;     // input file name
-    char *output = NULL;    // output file name
+    char *output = NULL;    // output file name (NEEDED???)
     // option parser
-    while ((c = getopt(argc, argv, "ho:")) != -1) {
+    while ((c = getopt(argc, argv, "ho:i:")) != -1) {
         switch (c) {
             case 'o':
                 if (!oflag) output = optarg;
                 oflag = 1;
                 break;
+            case 'i':
+                if (!iflag) input = optarg;
+                iflag = 1;
+                break;
             case 'h':
                 _printHelp();
                 exit(1);
             default:
-                printf("Use `-h` for help\n");
+                printf("ERROR: Use `-h` for help\n");
                 exit(1);
         }
     }
 
-    if (argc == 1) printError(ERR_NO_ARGS);
+    if (optind != argc) printError(ERR_BAD_ARGS);
 
-    for (int i = optind; i < argc; i++)
-        if (!input) input = argv[i];
+    if (input) {
+        printf("%s\n", input);
+        yyin = fopen(input, "r");
+    }
+    if (output) printf("%s\n", output);
+    printf("optind == %d\n", optind);
+    printf("argc == %d\n", argc);
 
-    if (!input) printError(ERR_NO_INPUT);
-    */
-
-    yyparse();
-    while (1) {
-        printf("> ");
-        fgets(input_buf, MAX_LENGTH, stdin);    // SAVES \n
-        printf("  %s", input_buf);
-        memset(input_buf, '\0', MAX_LENGTH);
+    short ret = 1;
+    while (ret) {
+        ret = yyparse();
     }
 
     return 0;
