@@ -4,7 +4,7 @@ HEADER_FILES_DIR = ./src/
 
 INCLUDES = -I $(HEADER_FILES_DIR)
 
-OUTPUT = dLexicalAnalyzer
+OUTPUT = mathA
 
 LIB_HEADERS = lex.yy.h syn.tab.h defs.h errors.h tree.h
 
@@ -23,10 +23,10 @@ src/syn.tab.%: src/syn.y
 	$(CC)   -c -o src/syn.tab.o src/syn.tab.c
 
 $(OUTPUT): $(OBJS)
-	$(CC) -o $(OUTPUT) $(OBJS)
+	$(CC) -o $(OUTPUT) $(OBJS) -lm
 	rm src/*.o
-	rm -f src/lex.yy.*
-	rm -f src/syn.tab.*
+	# rm -f src/lex.yy.*
+	# rm -f src/syn.tab.*
 
 %.o: %.c $(LIB_HEADERS)
 	$(CC) -c -o $@ $< $(INCLUDES)

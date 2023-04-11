@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "lex.yy.h"
 #include "syn.tab.h"
 
 #define MAX_LENGTH 1024

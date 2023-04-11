@@ -1,11 +1,14 @@
 %{
-#include "errors.h"
-#include "defs.h"
+    #include <stdlib.h>
+    #include "errors.h"
+    #include "defs.h"
+    #include "syn.tab.h"
 
-int num_lines = 0;
+    int num_lines = 0;
+
+    // TODO: USE YYLINENO
 %}
 
-/* no need to indicate here creation of .h file */
 %option yylineno
 %option stack
 %option noinput nounput noyywrap noyy_top_state
@@ -20,20 +23,20 @@ LINE_COMMENT    \/\/.*
 ID              [a-zA-Z_][a-zA-Z_0-9]*
 STRING          \"([^(\\\")]|(\\\"))*\"
 SPACE           [ \t]+
-NEWLINE         \n
 
 %%
 
 {DEC}  {
-    return(M_DEC_NUM);
+    yylval.value = strtod(yytext, NULL);
+    return(MA_DEC_NUM);
 }
 
 {BIN}  {
-    return(M_BIN_NUM);
+    return(MA_BIN_NUM);
 }
 
 {HEX}  {
-    return(M_HEX_NUM);
+    return(MA_HEX_NUM);
 }
 
 {LINE_COMMENT}  ;
@@ -71,39 +74,40 @@ NEWLINE         \n
 }
 
 "=="    {
-    return(M_EQUALS);
+    return(MA_EQUALS);
 }
 
 "!="    {
-    return(M_NOT_EQUALS);
+    return(MA_NOT_EQUALS);
 }
 
 "+="    {
-    return(M_PLUS_EQUALS);
+    return(MA_PLUS_EQUALS);
 }
 
 "++"    {
-    return(M_PLUS_PLUS);
+    return(MA_PLUS_PLUS);
 }
 
 "-="    {
-    return(M_MINUS_EQUALS);
+    return(MA_MINUS_EQUALS);
 }
 
 "--"    {
-    return(M_MINUS_MINUS);
+    return(MA_MINUS_MINUS);
 }
 
 {ID}    {
-    return(M_ID);
+    return(MA_ID);
 }
 
 {STRING}    {
-    return(M_STR);
+    return(MA_STR);
 }
 
-{NEWLINE}   {
+\n  {
     num_lines++;
+    return(yytext[0]);
 }
 
 {SPACE}   ;

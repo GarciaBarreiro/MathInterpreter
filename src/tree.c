@@ -15,8 +15,8 @@ struct node {
 struct node *T;
 
 // even though all keywords are defined, not all of them exist in regression.d
-comp kws[] = { { M_STR, "import" }, { M_STR, "double" }, { M_STR, "int" },
-        { M_STR, "while" }, { M_STR, "foreach" }, { M_STR, "return" }, { M_STR, "void" }};
+comp kws[] = { { MA_STR, "import" }, { MA_STR, "double" }, { MA_STR, "int" },
+        { MA_STR, "while" }, { MA_STR, "foreach" }, { MA_STR, "return" }, { MA_STR, "void" }};
 
 /*void _printTree(struct node *t) {
     printf("%d, %s\n", t->el.id, t->el.name);
@@ -39,13 +39,13 @@ void _freeTree(struct node *tr) {
         _freeTree(tr->lesser);
     if (tr->greater)
         _freeTree(tr->greater);
-    if (tr->el.id == M_ID) free(tr->el.name);
+    if (tr->el.id == MA_ID) free(tr->el.name);
     free(tr);
     tr = NULL;
 }
 
 comp _insertNode(struct node **tr, comp c) {
-    if (!c.id) c.id = M_ID;
+    if (!c.id) c.id = MA_ID;
     *tr = (struct node*) malloc(sizeof(struct node));
     (*tr)->el = c;
     (*tr)->lesser = NULL;
@@ -91,7 +91,7 @@ void freeTree() {
 
 comp searchNode(char *name) {
     comp c;
-    c.id = M_ID;
+    c.id = MA_ID;
     c.name = name;
 
     int cmp = strcmp(c.name, T->el.name);
