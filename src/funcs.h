@@ -3,6 +3,8 @@
 
 void ma_clear();
 
+void ma_clean();
+
 void ma_exit();
 
 void ma_help();

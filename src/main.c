@@ -17,7 +17,8 @@ void _printHelp() {
         "Options:\n"
         "    -h        Shows this screen\n"
         "    -i FILE   Reads input from FILE\n"
-        "    -o FILE   Saves output to FILE\n");
+        "    -o FILE   Saves output to FILE\n\n"
+        "Inside the prompt, call `help()` for help with functions\n");
 }
 
 int main(int argc, char *argv[]) {

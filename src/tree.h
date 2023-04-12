@@ -7,10 +7,8 @@ union ptr { // TODO: change
 };
 
 typedef struct {
-    int id;     // ID vs different keywords
     int type;   // is it a function, a variable or a constant?
     char *name;
-    // union ptr a;// points to var value / function (TODO)
     union ptr p;
 } comp;
 
@@ -21,8 +19,9 @@ void initTree();
 void freeTree();
 
 // searches node for name
-// if it doesn't exist, name is inserted
-// returns either a keyword id or D_ID
-comp searchNode(char *name);
+void searchNode(comp *c, short insert);
+
+// prints current initialized variables
+void printWorkspace();
 
 #endif // TABLE_H

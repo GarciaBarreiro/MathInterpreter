@@ -1,15 +1,6 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-// keywords
-#define MA_CLEAN 600        // clean workspace
-#define MA_EXIT 601         // exit program
-#define MA_HELP 602         // print help
-#define MA_IMPORT 603       // import header
-#define MA_LET 604          // define variable
-#define MA_LOAD 605         // load file
-#define MA_WORKSPACE 606    // print workspace
-
 // operators    (maybe needed??)
 #define MA_EQUALS 650       // ==
 #define MA_NOT_EQUALS 651   // !=
@@ -22,6 +13,7 @@
 #define MA_ID 700           // variables
 #define MA_FUNC 701         // functions
 #define MA_CONST 702        // constants (PI, E)
+#define MA_COMMAND 703      // commands (internal functions)
 
 // num types
 #define MA_DEC_NUM 750

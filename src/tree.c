@@ -16,15 +16,16 @@ struct node {
 struct node *T;
 
 // even though all keywords are defined, not all of them exist in regression.d
-comp kws[] = { {MA_IMPORT, MA_FUNC, "import", {&ma_import}}, {MA_EXIT, MA_FUNC, "exit", {&ma_exit}}, {MA_LOAD, MA_FUNC, "load", {&ma_load}},
-    {MA_CLEAN, MA_FUNC, "clear", {&ma_clear}}, {MA_HELP, MA_FUNC, "help", {&ma_help}}, {MA_WORKSPACE, MA_FUNC, "workspace", {&ma_workspace}} };
+comp kws[] = { {MA_COMMAND, "import", {&ma_import}}, {MA_COMMAND, "exit", {&ma_exit}}, {MA_COMMAND, "load", {&ma_load}},
+    {MA_COMMAND, "clear", {&ma_clear}}, {MA_COMMAND, "help", {&ma_help}}, {MA_COMMAND, "workspace", {&ma_workspace}},
+    {MA_COMMAND, "clean", {&ma_clean}}, {MA_CONST, "PI", {.value = MA_PI}}, {MA_CONST, "E", {.value = MA_E}}};
 
-/*void _printTree(struct node *t) {
-    printf("%d, %s\n", t->el.id, t->el.name);
+void _printTree(struct node *t) {
     if (t->lesser) _printTree(t->lesser);
+    printf("%d, %s\n", t->el.type, t->el.name);
     if (t->greater) _printTree(t->greater);
     
-}*/
+}
 
 struct node _createNode(comp kw) {
     struct node n;
@@ -40,36 +41,34 @@ void _freeTree(struct node *tr) {
         _freeTree(tr->lesser);
     if (tr->greater)
         _freeTree(tr->greater);
-    if (tr->el.id == MA_ID) free(tr->el.name);
+    if (tr->el.type == MA_ID) free(tr->el.name);
     free(tr);
     tr = NULL;
 }
 
-comp _insertNode(struct node **tr, comp c) {
-    if (!c.id) c.id = MA_ID;
+void _insertNode(struct node **tr, comp *c) {
+    if (!c->type) c->type = MA_ID;
     *tr = (struct node*) malloc(sizeof(struct node));
-    (*tr)->el = c;
+    (*tr)->el = *c;
     (*tr)->lesser = NULL;
     (*tr)->greater = NULL;
-    return c;
 }
 
 // if not found, inserted
-comp _searchNode(struct node *tr, comp c) {
-    int cmp = strcmp(c.name, tr->el.name);
+void _searchNode(struct node *tr, comp *c, short insert) {
+    printf("init\n");
+    int cmp = strcmp(c->name, tr->el.name);
 
     if (!cmp) {
-        free(c.name);
-        c = tr->el;
+        free(c->name);
+        *c = tr->el;
     } else if (cmp < 0) {
-        if (tr->lesser) c = _searchNode(tr->lesser, c);
-        else c = _insertNode(&tr->lesser, c);
+        if (tr->lesser) _searchNode(tr->lesser, c, insert);
+        else if (insert) _insertNode(&tr->lesser, c);
     } else {
-        if (tr->greater) c = _searchNode(tr->greater, c);
-        else c = _insertNode(&tr->greater, c);
+        if (tr->greater) _searchNode(tr->greater, c, insert);
+        else if (insert) _insertNode(&tr->greater, c);
     }
-
-    return c;
 }
 
 // tree root is first keyword
@@ -80,9 +79,13 @@ void initTree() {
     T->greater = NULL;
 
     size_t total_kws = sizeof(kws) / sizeof(kws[0]);
+    printf("total_kes == %ld\n", total_kws);
 
-    for (int i = 1; i < total_kws; i++)
-        _searchNode(T, kws[i]);
+    for (int i = 1; i < total_kws; i++) {
+        printf("%d\n", i);
+        _searchNode(T, &kws[i], 1);
+    }
+    printf("init\n");
 }
 
 void freeTree() {
@@ -90,23 +93,34 @@ void freeTree() {
         _freeTree(T);
 }
 
-comp searchNode(char *name) {
-    comp c;
-    c.id = MA_ID;
-    c.name = name;
+void searchNode(comp *c, short insert) {
+    c->type = 0;
 
-    int cmp = strcmp(c.name, T->el.name);
+    _printTree(T);
+
+    printf("c.name == %s\n", c->name);
+
+    int cmp = strcmp(c->name, T->el.name);
 
     if (!cmp) {
-        free(c.name);
-        c = T->el;
+        free(c->name);
+        *c = T->el;
     } else if (cmp < 0) {
-        if (T->lesser) c = _searchNode(T->lesser, c);
-        else c = _insertNode(&T->lesser, c);
+        if (T->lesser) _searchNode(T->lesser, c, insert);
     } else {
-        if (T->greater) c = _searchNode(T->greater, c);
-        else c = _insertNode(&T->greater, c);
+        if (T->greater) _searchNode(T->greater, c, insert);
     }
+}
 
-    return c;
+void _printWorkspace(struct node *t) {
+    if (t->lesser) _printWorkspace(t->lesser);
+
+    if (t->el.type == MA_ID || t->el.type == MA_CONST)
+        printf("    %.16s == %lf\n", t->el.name, t->el.p.value);
+    
+    if (t->greater) _printWorkspace(t->greater);
+}
+
+void printWorkspace() {
+    _printWorkspace(T);
 }

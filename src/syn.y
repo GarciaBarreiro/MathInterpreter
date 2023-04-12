@@ -22,7 +22,7 @@
 %left '-' '+'
 %left '*' '/'
 %left '%' ','   // TODO: check if left or right
-%right '^'
+%right '^' '='
 
 %type <value> exp
 %type <lex> keyw
@@ -44,24 +44,31 @@ line:
 
 exp:
     NUM                  /* when a rule has no action, bison does $$ = $1 */
-    | exp '+' exp       { $$ = $1 + $3;     }
-    | exp '-' exp       { $$ = $1 - $3;     }
-    | exp '*' exp       { $$ = $1 * $3;     }
-    | exp '/' exp       { $$ = $1 / $3;     }
-    | '-' exp           { $$ = -$2;         }   /*???*/
+    | exp '+' exp       { $$ = $1 + $3; }
+    | exp '-' exp       { $$ = $1 - $3; }
+    | exp '*' exp       { $$ = $1 * $3; }
+    | exp '/' exp       { $$ = $1 / $3; }
+    | '-' exp           { $$ = -$2; }   /*???*/
     | exp '^' exp       { $$ = pow($1, $3); }
-    | exp '%' exp       { $$ = (long) $1 % (long) $3;   }
-    | '(' exp ')'       { $$ = $2;          }
+    | exp '%' exp       { $$ = (long) $1 % (long) $3; }
+    | '(' exp ')'       { $$ = $2; }
     ;
 
 keyw:
     ID                  { $$ = $1; printf("keyw %s\n", $$);/*TODO: BUSCAR TABOA*/ }
     | keyw '(' param ')'{ $$ = $1;          }
-    | keyw '(' ')'      { comp c = searchNode($1);  /*TODO: BORRAR SE NON EXISTE E MOSTRAR ERRO*/
-                          if (c.type == MA_FUNC) {
+    | keyw '(' ')'      { comp c;
+                          c.name = $1;
+                          searchNode(&c, 0);  /*TODO: BORRAR SE NON EXISTE E MOSTRAR ERRO*/
+                          if (c.type == MA_COMMAND || c.type == MA_FUNC) {
                             printf("aaaaaaaaaaaaa\n");
                             c.p.func();
+                          } else {
+                            printf("NO FUNCTIONS OF THIS NAME\n");
                           }}/* TODO: exit() and such */
+    | keyw '=' exp      { comp c;
+                          c.name = $1;
+                          searchNode(&c, 1);}
     ;
 
 param:
