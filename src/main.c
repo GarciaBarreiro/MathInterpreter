@@ -7,6 +7,7 @@
 #include "syn.tab.h"
 
 #include "errors.h"
+#include "tree.h"
 
 #define MAX_LENGTH 1024
 
@@ -49,15 +50,17 @@ int main(int argc, char *argv[]) {
     if (input) {
         printf("%s\n", input);
         yyin = fopen(input, "r");
-    }
+    } else yyin = stdin;
     if (output) printf("%s\n", output);
     printf("optind == %d\n", optind);
     printf("argc == %d\n", argc);
 
+    initTree();
     short ret = 1;
     while (ret) {
         ret = yyparse();
     }
+    freeTree();
 
     return 0;
 }

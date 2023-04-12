@@ -4,6 +4,7 @@
 
 #include "tree.h"
 #include "defs.h"
+#include "funcs.h"
 
 // this is not an optimal implementation of a table
 
@@ -15,8 +16,8 @@ struct node {
 struct node *T;
 
 // even though all keywords are defined, not all of them exist in regression.d
-comp kws[] = { { MA_STR, "import" }, { MA_STR, "double" }, { MA_STR, "int" },
-        { MA_STR, "while" }, { MA_STR, "foreach" }, { MA_STR, "return" }, { MA_STR, "void" }};
+comp kws[] = { {MA_IMPORT, MA_FUNC, "import", {&ma_import}}, {MA_EXIT, MA_FUNC, "exit", {&ma_exit}}, {MA_LOAD, MA_FUNC, "load", {&ma_load}},
+    {MA_CLEAN, MA_FUNC, "clear", {&ma_clear}}, {MA_HELP, MA_FUNC, "help", {&ma_help}}, {MA_WORKSPACE, MA_FUNC, "workspace", {&ma_workspace}} };
 
 /*void _printTree(struct node *t) {
     printf("%d, %s\n", t->el.id, t->el.name);

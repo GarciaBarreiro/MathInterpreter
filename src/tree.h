@@ -1,15 +1,17 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-union ptr {
-    double d_value;
-    long l_value;
+union ptr { // TODO: change
+    void (*func)();
+    double value;
 };
 
 typedef struct {
-    int id;
+    int id;     // ID vs different keywords
+    int type;   // is it a function, a variable or a constant?
     char *name;
-    union ptr a;
+    // union ptr a;// points to var value / function (TODO)
+    union ptr p;
 } comp;
 
 // inits tree with keywords

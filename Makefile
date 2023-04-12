@@ -6,9 +6,9 @@ INCLUDES = -I $(HEADER_FILES_DIR)
 
 OUTPUT = mathA
 
-LIB_HEADERS = lex.yy.h syn.tab.h defs.h errors.h tree.h
+LIB_HEADERS = lex.yy.h syn.tab.h defs.h funcs.h errors.h tree.h
 
-SRCS = src/lex.yy.c src/syn.tab.c src/main.c src/errors.c src/tree.c
+SRCS = src/lex.yy.c src/syn.tab.c src/main.c src/funcs.c src/errors.c src/tree.c
 
 OBJS = $(SRCS:.c=.o)
 

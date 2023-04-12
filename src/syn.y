@@ -21,6 +21,7 @@
 // %token <value> NUM MA_DEC_NUM
 %left '-' '+'
 %left '*' '/'
+%left '%' ','   // TODO: check if left or right
 %right '^'
 
 %type <value> exp
@@ -49,20 +50,24 @@ exp:
     | exp '/' exp       { $$ = $1 / $3;     }
     | '-' exp           { $$ = -$2;         }   /*???*/
     | exp '^' exp       { $$ = pow($1, $3); }
-    | exp '*' '*' exp   { $$ = pow($1, $4); }
+    | exp '%' exp       { $$ = (long) $1 % (long) $3;   }
     | '(' exp ')'       { $$ = $2;          }
     ;
 
 keyw:
     ID                  { $$ = $1; printf("keyw %s\n", $$);/*TODO: BUSCAR TABOA*/ }
     | keyw '(' param ')'{ $$ = $1;          }
-    | keyw '(' ')'      /* TODO: exit() and such */
+    | keyw '(' ')'      { comp c = searchNode($1);  /*TODO: BORRAR SE NON EXISTE E MOSTRAR ERRO*/
+                          if (c.type == MA_FUNC) {
+                            printf("aaaaaaaaaaaaa\n");
+                            c.p.func();
+                          }}/* TODO: exit() and such */
     ;
 
 param:
      exp
      | keyw
-     | param ',' param
+     | param ',' param  /* ???? */
      ;
 
 %%
