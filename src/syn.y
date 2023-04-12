@@ -44,6 +44,13 @@ line:
 
 exp:
     NUM                  /* when a rule has no action, bison does $$ = $1 */
+    | ID                { comp c; c.name = $1; c.type = 0;
+                          searchNode(&c, 0);
+                          if (c.type == MA_ID || c.type == MA_CONST) {
+                              $$ = c.p.value;
+                          } else {
+                              printf("undefined var\n");
+                          }}
     | exp '+' exp       { $$ = $1 + $3; }
     | exp '-' exp       { $$ = $1 - $3; }
     | exp '*' exp       { $$ = $1 * $3; }
@@ -68,6 +75,7 @@ keyw:
                           }}/* TODO: exit() and such */
     | keyw '=' exp      { comp c;
                           c.name = $1;
+                          c.p.value = $3;
                           searchNode(&c, 1);}
     ;
 

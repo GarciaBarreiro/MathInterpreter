@@ -56,11 +56,11 @@ void _insertNode(struct node **tr, comp *c) {
 
 // if not found, inserted
 void _searchNode(struct node *tr, comp *c, short insert) {
-    printf("init\n");
     int cmp = strcmp(c->name, tr->el.name);
 
     if (!cmp) {
         free(c->name);
+        tr->el.p = c->p;
         *c = tr->el;
     } else if (cmp < 0) {
         if (tr->lesser) _searchNode(tr->lesser, c, insert);
@@ -79,13 +79,10 @@ void initTree() {
     T->greater = NULL;
 
     size_t total_kws = sizeof(kws) / sizeof(kws[0]);
-    printf("total_kes == %ld\n", total_kws);
 
     for (int i = 1; i < total_kws; i++) {
-        printf("%d\n", i);
         _searchNode(T, &kws[i], 1);
     }
-    printf("init\n");
 }
 
 void freeTree() {
@@ -94,16 +91,12 @@ void freeTree() {
 }
 
 void searchNode(comp *c, short insert) {
-    c->type = 0;
-
-    _printTree(T);
-
-    printf("c.name == %s\n", c->name);
-
     int cmp = strcmp(c->name, T->el.name);
+    c->type = 0;
 
     if (!cmp) {
         free(c->name);
+        T->el.p = c->p;
         *c = T->el;
     } else if (cmp < 0) {
         if (T->lesser) _searchNode(T->lesser, c, insert);
