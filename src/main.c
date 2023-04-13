@@ -58,10 +58,11 @@ int main(int argc, char *argv[]) {
 
     initTree();
     short ret = 1;
-    while (ret) {
+    while (ret) {  // if ret == 0, YYACCEPT
         ret = yyparse();
+        printf("ret == %d\n", ret);
     }
-    freeTree();
+    freeTree(); // in case it ends differently than with `exit()`
 
     return 0;
 }

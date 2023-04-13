@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "funcs.h"
+#include "lex.yy.h"
 #include "tree.h"
 
 void ma_clear() {
@@ -9,11 +10,14 @@ void ma_clear() {
 }
 
 void ma_clean() {   // TODO: clean workspace (delete vars, imported libs)
-
+    // maybe don't
 }
 
 void ma_exit() {
     // TODO: free everything
+    freeTree();
+    yylex_destroy();
+    exit(0);
 }
 
 void ma_help() {

@@ -27,7 +27,7 @@ SPACE           [ \t]+
 %%
 
 {DEC}  {
-    yylval.value = strtod(yytext, NULL);
+    yylval.s.value = strtod(yytext, NULL);
     return(MA_DEC_NUM);
 }
 
@@ -97,8 +97,18 @@ SPACE           [ \t]+
     return(MA_MINUS_MINUS);
 }
 
+">>"    {
+    yylval.s.lex = strdup(yytext);
+    return(MA_PRINT_R);
+}
+
+"<<"    {
+    yylval.s.lex = strdup(yytext);
+    return(MA_PRINT_L);
+}
+
 {ID}    {
-    yylval.lex = strdup(yytext);
+    yylval.s.lex = strdup(yytext);
     return(MA_ID);
 }
 

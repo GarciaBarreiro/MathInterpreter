@@ -22,8 +22,11 @@
 
 #define MA_EOF 800
 
+#define MA_PRINT_R 850      // ">>"
+#define MA_PRINT_L 851      // "<<"
+
 // strings
-#define MA_STR 850
+#define MA_STR 900
 
 #define MA_PI 3.14159
 #define MA_E  2.71828

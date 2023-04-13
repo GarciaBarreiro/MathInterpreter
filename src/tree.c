@@ -60,7 +60,7 @@ void _searchNode(struct node *tr, comp *c, short insert) {
 
     if (!cmp) {
         free(c->name);
-        tr->el.p = c->p;
+        if (tr->el.type == MA_ID) tr->el.p = c->p;
         *c = tr->el;
     } else if (cmp < 0) {
         if (tr->lesser) _searchNode(tr->lesser, c, insert);
@@ -94,9 +94,11 @@ void searchNode(comp *c, short insert) {
     int cmp = strcmp(c->name, T->el.name);
     c->type = 0;
 
+    _printTree(T);
+
     if (!cmp) {
         free(c->name);
-        T->el.p = c->p;
+        if (T->el.type == MA_ID) T->el.p = c->p;
         *c = T->el;
     } else if (cmp < 0) {
         if (T->lesser) _searchNode(T->lesser, c, insert);
@@ -109,7 +111,7 @@ void _printWorkspace(struct node *t) {
     if (t->lesser) _printWorkspace(t->lesser);
 
     if (t->el.type == MA_ID || t->el.type == MA_CONST)
-        printf("    %.16s == %lf\n", t->el.name, t->el.p.value);
+        printf("    %-12s == %lf\n", t->el.name, t->el.p.value);
     
     if (t->greater) _printWorkspace(t->greater);
 }
