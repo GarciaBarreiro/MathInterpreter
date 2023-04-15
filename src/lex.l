@@ -98,12 +98,10 @@ SPACE           [ \t]+
 }
 
 ">>"    {
-    yylval.s.lex = strdup(yytext);
     return(MA_PRINT_R);
 }
 
 "<<"    {
-    yylval.s.lex = strdup(yytext);
     return(MA_PRINT_L);
 }
 
@@ -113,6 +111,8 @@ SPACE           [ \t]+
 }
 
 {STRING}    {
+    /* removes quotes */
+    yylval.s.lex = strndup(&yytext[1], strlen(yytext) - 2);
     return(MA_STR);
 }
 

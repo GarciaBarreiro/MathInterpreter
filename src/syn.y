@@ -24,9 +24,11 @@
 %token <s> FILE_EOF 800
 %token <s> PRINT_R 850
 %token <s> PRINT_L 851
+%token <s> STRING 900
 
-%left '-' '+' '*' '/' '%' ',' '=' PRINT_R
-%right '^' '(' PRINT_L
+%left '-' '+' '*' '/' '%' ',' '=' PRINT_L
+%left NEG
+%right '^' '(' PRINT_R
 
 %type <s> exp
 %type <s> type
@@ -48,28 +50,28 @@ line:
     | exp '\n'          { _printPrompt(); }
     | exp PRINT_R '\n'  { fprintf(stdout, "%lf\n", $<s.value>1);
                           _printPrompt(); }
-    | exp PRINT_R ID '\n'   { FILE *fp = fopen($<s.lex>3, "a");
-                              fprintf(fp, "%lf\n", $<s.value>1);
-                              fclose(fp);   /*COSTLY*/
-                              _printPrompt(); }
-    | PRINT_L exp '\n'  { fprintf(stdout, "%lf\n", $<s.value>3);
+    | exp PRINT_R STRING '\n'   { FILE *fp = fopen($<s.lex>3, "a");
+                                  fprintf(fp, "%lf\n", $<s.value>1);
+                                  fclose(fp);   /*COSTLY*/
+                                  _printPrompt(); }
+    | PRINT_L exp '\n'  { fprintf(stdout, "%lf\n", $<s.value>2);
                           _printPrompt(); }
-    | ID PRINT_L exp '\n'   { FILE *fp = fopen($<s.lex>1, "a");
-                              fprintf(fp, "%lf\n", $<s.value>3);
-                              fclose(fp);
-                              _printPrompt(); }
+    | STRING PRINT_L exp '\n'   { FILE *fp = fopen($<s.lex>1, "a");
+                                  fprintf(fp, "%lf\n", $<s.value>3);
+                                  fclose(fp);
+                                  _printPrompt(); }
     ;
 
 exp:
     type
-    | '(' exp ')'       { $<s.value>$ = $<s.value>2; }
     | exp '+' exp       { $<s.value>$ = $<s.value>1 + $<s.value>3; }
     | exp '-' exp       { $<s.value>$ = $<s.value>1 - $<s.value>3; }
     | exp '*' exp       { $<s.value>$ = $<s.value>1 * $<s.value>3; }
     | exp '/' exp       { $<s.value>$ = $<s.value>1 / $<s.value>3; }
-    | '-' exp           { $<s.value>$ = -$<s.value>2; }   /*???*/
     | exp '^' exp       { $<s.value>$ = pow($<s.value>1, $<s.value>3); }
     | exp '%' exp       { $<s.value>$ = (long) $<s.value>1 % (long) $<s.value>3; }
+    | '(' exp ')'       { $<s.value>$ = $<s.value>2; }
+    | '-' exp %prec NEG { $<s.value>$ = - $<s.value>2; }   /*???*/
     | func
     ;
 
@@ -81,8 +83,26 @@ func:
                             c.p.func();
                           } else {
                             printf("NO FUNCTIONS OF THIS NAME\n");
+                            free(c.name);
                           } }
-    | ID '(' exp ')'    { }
+    | ID '(' STRING ')' { comp c; c.name = $<s.lex>1;
+                          searchNode(&c, 0);
+                          if (c.type == MA_COMMAND || c.type == MA_FUNC) {
+                              printf("a\n");
+                              c.p.func($<s.lex>3);
+                          } else {
+                              printf("TODO: call errors\n");
+                              free(c.name);
+                          } }
+    | ID '(' exp ')'    { comp c; c.name = $<s.lex>1;
+                          searchNode(&c, 0);
+                          if (c.type == MA_COMMAND || c.type == MA_FUNC) {
+                              printf("b\n");
+                              c.p.func($<s.value>3);
+                          } else {
+                              printf("TODO: call errors\n");
+                              free(c.name);
+                          } }
     | ID '(' exp ',' exp ')'
     ;
 
@@ -93,6 +113,7 @@ type:
                               $<s.value>$ = c.p.value;
                           } else {
                               printf("TODO: UNDEF VAR\n");
+                              free(c.name);
                           } }
     | NUM
     ;

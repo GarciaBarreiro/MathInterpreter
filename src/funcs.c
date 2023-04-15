@@ -4,6 +4,7 @@
 #include "funcs.h"
 #include "lex.yy.h"
 #include "tree.h"
+#include "errors.h"
 
 void ma_clear() {
     system("clear");
@@ -35,16 +36,22 @@ void ma_help() {
 }
 
 void ma_import(char *header) {
-
+    printf("holaaaaaaaa %s\n", header);
 }
 
 void ma_load(char *file) {  // TODO
+    printf("file == %s\n", file);
+
     FILE *fp = fopen(file, "r");
 
     if (!fp) {
         printf("ERROR (TODO)\n");
+        printError(ERR_BAD_FILE);   // TODO: don't exit
     }
 
+    free(file);
+
+    yyrestart(fp);
 }
 
 void ma_workspace() {

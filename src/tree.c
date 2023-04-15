@@ -16,9 +16,15 @@ struct node {
 struct node *T;
 
 // even though all keywords are defined, not all of them exist in regression.d
-comp kws[] = { {MA_COMMAND, "import", {&ma_import}}, {MA_COMMAND, "exit", {&ma_exit}}, {MA_COMMAND, "load", {&ma_load}},
-    {MA_COMMAND, "clear", {&ma_clear}}, {MA_COMMAND, "help", {&ma_help}}, {MA_COMMAND, "workspace", {&ma_workspace}},
-    {MA_COMMAND, "clean", {&ma_clean}}, {MA_CONST, "PI", {.value = MA_PI}}, {MA_CONST, "E", {.value = MA_E}}};
+comp kws[] = { {MA_COMMAND, "import", {&ma_import}},
+               {MA_COMMAND, "exit", {&ma_exit}},
+               {MA_COMMAND, "load", {&ma_load}},
+               {MA_COMMAND, "clear", {&ma_clear}}, 
+               {MA_COMMAND, "help", {&ma_help}}, 
+               {MA_COMMAND, "workspace", {&ma_workspace}},
+               {MA_COMMAND, "clean", {&ma_clean}},
+               {MA_CONST, "PI", {.value = MA_PI}},
+               {MA_CONST, "E", {.value = MA_E}}};
 
 void _printTree(struct node *t) {
     if (t->lesser) _printTree(t->lesser);
@@ -94,7 +100,7 @@ void searchNode(comp *c, short insert) {
     int cmp = strcmp(c->name, T->el.name);
     c->type = 0;
 
-    _printTree(T);
+    // _printTree(T);
 
     if (!cmp) {
         free(c->name);
