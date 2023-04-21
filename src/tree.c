@@ -47,7 +47,7 @@ void _freeTree(struct node *tr) {
         _freeTree(tr->lesser);
     if (tr->greater)
         _freeTree(tr->greater);
-    if (tr->el.type == MA_ID) free(tr->el.name);
+    if (tr->el.type == MA_ID) free(tr->el.name);    /* TODO: or imported func */
     free(tr);
     tr = NULL;
 }
@@ -113,15 +113,52 @@ void searchNode(comp *c, short insert) {
     }
 }
 
-void _printWorkspace(struct node *t) {
-    if (t->lesser) _printWorkspace(t->lesser);
+void _printWorkspace(struct node *t, int type, short *found) {
+    if (t->lesser) _printWorkspace(t->lesser, type, found);
 
-    if (t->el.type == MA_ID || t->el.type == MA_CONST)
-        printf("    %-12s == %lf\n", t->el.name, t->el.p.value);
+    if (type == t->el.type && type != MA_FUNC) {
+        if (!(*found)) {
+            *found = 1;
+            if (type == MA_CONST) printf("CONSTANTS:\n");
+            else printf("DECLARED VARIABLES:\n");
+        }
+        printf("    %-12s == %.6lf\n", t->el.name, t->el.p.value);
+    }
+
+    if (type == t->el.type && type == MA_FUNC) {
+        if (!(*found)) {
+            *found = 1;
+            printf("IMPORTED FUNCTIONS:\n");
+        }
+        printf("    %-12s()\n", t->el.name);
+    }
     
-    if (t->greater) _printWorkspace(t->greater);
+    if (t->greater) _printWorkspace(t->greater, type, found);
 }
 
 void printWorkspace() {
-    _printWorkspace(T);
+    short found = 0;
+    _printWorkspace(T, MA_FUNC, &found);
+    found = 0;
+    _printWorkspace(T, MA_ID, &found);
+    found = 0;
+    _printWorkspace(T, MA_CONST, &found);
+}
+
+short _cleanWorkspace(struct node *tr) {
+    if (tr->lesser)
+        if (_cleanWorkspace(tr->lesser)) tr->lesser = NULL;
+    if (tr->greater)
+        if (_cleanWorkspace(tr->greater)) tr->greater = NULL;
+    if (tr->el.type == MA_ID) {
+        free(tr->el.name);    /* TODO: or imported func */
+        free(tr);
+        tr = NULL;
+        return 1;
+    }
+    return 0;
+}
+
+void cleanWorkspace() {
+    _cleanWorkspace(T);
 }

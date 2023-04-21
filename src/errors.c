@@ -11,16 +11,14 @@ void printError(int error) {
             exit(1);
             break;
         case ERR_NO_INPUT:
-            fprintf(stderr, "ERROR: No input file\n");
+            fprintf(stderr, "ERROR: No input file\n");      // don't need it
             exit(1);
             break;
         case ERR_BAD_FILE:
-            fprintf(stderr, "ERROR: Unable to read file\n");
-            exit(1);
+            fprintf(stderr, "ERROR: Unable to read file, going back to prompt mode\n");
             break;
         case ERR_BAD_EXTENSION:
-            fprintf(stderr, "ERROR: File needs to have a D extension\n");
-            exit(1);
+            fprintf(stderr, "ERROR: File needs to have a MA extension, going back to prompt mode\n");
             break;
         case ERR_BAD_MALLOC:
             fprintf(stderr, "INTERNAL ERROR: `malloc` has failed, aborting...\n");

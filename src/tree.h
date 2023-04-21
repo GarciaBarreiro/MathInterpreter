@@ -24,4 +24,7 @@ void searchNode(comp *c, short insert);
 // prints current initialized variables
 void printWorkspace();
 
+// similar to freeTree, probably gonna merge them later
+void cleanWorkspace();
+
 #endif // TABLE_H

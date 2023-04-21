@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <dlfcn.h>
 
 #include "funcs.h"
 #include "lex.yy.h"
@@ -10,8 +12,8 @@ void ma_clear() {
     system("clear");
 }
 
-void ma_clean() {   // TODO: clean workspace (delete vars, imported libs)
-    // maybe don't
+void ma_clean() {
+    cleanWorkspace();
 }
 
 void ma_exit() {
@@ -35,13 +37,29 @@ void ma_help() {
             );
 }
 
-void ma_import(char *header) {
+void ma_import(char *header) {      // either full path or relative
     printf("holaaaaaaaa %s\n", header);
+    char *name;
+    void *handle = dlopen(header, RTLD_LAZY);
+
+    if (!handle) {
+        printf("TODO: HEADER NOT FOUND\n");
+        return;
+    }
+
+    if ((name = strrchr(header, '/')) != NULL) {
+        name = name + 1;
+        printf("NAME == %s\n", name);
+    }   // TODO
+
 }
 
 void ma_load(char *file) {  // TODO
-    printf("file == %s\n", file);
-
+    char *ext = strrchr(file, '.');
+    if (!ext || strcmp(ext, ".ma")) {
+        printError(ERR_BAD_EXTENSION);
+        return;
+    }
     FILE *fp = fopen(file, "r");
 
     if (!fp) {
@@ -50,11 +68,9 @@ void ma_load(char *file) {  // TODO
     }
 
     free(file);
-
-    yyrestart(fp);
+    yyin = fp;
 }
 
 void ma_workspace() {
-    printf("INITIALIZED VARIABLES AND CONSTANTS\n");
     printWorkspace();
 }

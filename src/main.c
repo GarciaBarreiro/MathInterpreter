@@ -17,22 +17,18 @@ void _printHelp() {
         "Options:\n"
         "    -h        Shows this screen\n"
         "    -i FILE   Reads input from FILE\n"
-        "    -o FILE   Saves output to FILE\n\n"
         "Inside the prompt, call `help()` for help with functions\n");
 }
 
 int main(int argc, char *argv[]) {
     char c;
-    short oflag = 0, iflag = 0;
+    short iflag = 0;
     char *input = NULL;     // input file name
-    char *output = NULL;    // output file name (NEEDED???)
+    char *ext = NULL;       // pointer to file extension
+
     // option parser
-    while ((c = getopt(argc, argv, "ho:i:")) != -1) {
+    while ((c = getopt(argc, argv, "hi:")) != -1) {
         switch (c) {
-            case 'o':
-                if (!oflag) output = optarg;
-                oflag = 1;
-                break;
             case 'i':
                 if (!iflag) input = optarg;
                 iflag = 1;
@@ -49,10 +45,14 @@ int main(int argc, char *argv[]) {
     if (optind != argc) printError(ERR_BAD_ARGS);
 
     if (input) {
-        printf("%s\n", input);
-        yyin = fopen(input, "r");
+        ext = strrchr(input, '.');
+        if (!ext || strcmp(ext, ".ma")) {
+            printError(ERR_BAD_EXTENSION);
+        } else {
+            yyin = fopen(input, "r");
+        }
     } else yyin = stdin;
-    if (output) printf("%s\n", output);
+
     printf("optind == %d\n", optind);
     printf("argc == %d\n", argc);
 

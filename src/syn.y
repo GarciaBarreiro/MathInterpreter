@@ -26,9 +26,9 @@
 %token <s> PRINT_L 851
 %token <s> STRING 900
 
-%left '-' '+' '*' '/' '%' ',' '=' PRINT_L
+%left '-' '+' '*' '/' '%' ',' PRINT_L
 %left NEG
-%right '^' '(' PRINT_R
+%right '^' '(' '=' PRINT_R
 
 %type <s> exp
 %type <s> type
@@ -39,7 +39,7 @@
 input:
     %empty              { _printPrompt(); }
     | input line
-    | input FILE_EOF    { printf("\r\rFinised parsing file, entering prompt mode\n> ");} /*TODO: AT EOF, CLEAR TREE FROM VARS*/
+    | input FILE_EOF    { printf("\r\rFinished parsing file, entering prompt mode\n> ");} /*TODO: AT EOF, CLEAR TREE FROM VARS*/
     ;
 
 line:
@@ -70,8 +70,9 @@ exp:
     | exp '/' exp       { $<s.value>$ = $<s.value>1 / $<s.value>3; }
     | exp '^' exp       { $<s.value>$ = pow($<s.value>1, $<s.value>3); }
     | exp '%' exp       { $<s.value>$ = (long) $<s.value>1 % (long) $<s.value>3; }
-    | '(' exp ')'       { $<s.value>$ = $<s.value>2; }
     | '-' exp %prec NEG { $<s.value>$ = - $<s.value>2; }   /*???*/
+    | '+' exp %prec NEG { $<s.value>$ = $<s.value>2; }
+    | '(' exp ')'       { $<s.value>$ = $<s.value>2; }
     | func
     ;
 
