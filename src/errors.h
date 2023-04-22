@@ -13,6 +13,8 @@ void printError(int error);
 #define ERR_BLOCK_COMMENT 6     // EOF and block comment isn't closed
 #define ERR_NESTED_COMMENT 7    // EOF and nested comment isn't closed
 #define ERR_SYNTAX 8            // byson calls yyerror()
+#define ERR_NO_VAR 9
+#define ERR_NO_FUNC 10
 
 void printErrorLine(int error, int line_number);
 

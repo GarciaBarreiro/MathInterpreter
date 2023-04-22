@@ -4,8 +4,6 @@
     #include "defs.h"
     #include "syn.tab.h"
 
-    int num_lines = 0;
-
     // TODO: USE YYLINENO
     double _bintod(char *str);
     double _hextod(char *str);
@@ -56,7 +54,6 @@ SPACE           [ \t]+
 <BLOCK_COMMENT>.    ;
 
 <BLOCK_COMMENT>\n   {
-    num_lines++;
 }
 
 \/\+    {
@@ -74,15 +71,6 @@ SPACE           [ \t]+
 <NESTED_COMMENT>.   ;
 
 <NESTED_COMMENT>\n  {
-    num_lines++;
-}
-
-"=="    {
-    return(MA_EQUALS);
-}
-
-"!="    {
-    return(MA_NOT_EQUALS);
 }
 
 "+="    {
@@ -121,7 +109,6 @@ SPACE           [ \t]+
 }
 
 \n  {
-    num_lines++;
     return(yytext[0]);
 }
 
@@ -133,9 +120,9 @@ SPACE           [ \t]+
 
 <<EOF>> {
     if (YYSTATE == BLOCK_COMMENT)
-        printErrorLine(ERR_BLOCK_COMMENT, num_lines);
+        printErrorLine(ERR_BLOCK_COMMENT, yylineno);
     else if (YYSTATE == NESTED_COMMENT)
-        printErrorLine(ERR_NESTED_COMMENT, num_lines);
+        printErrorLine(ERR_NESTED_COMMENT, yylineno);
 
     //yy_delete_buffer(YY_CURRENT_BUFFER);
     fclose(yyin);
@@ -145,6 +132,7 @@ SPACE           [ \t]+
     /* TODO: CALL LATER FROM syn.y*/
     /*yylex_destroy();
     yy_init = 1;*/
+    yylineno = 0;
     return MA_EOF;
 }
 

@@ -24,7 +24,11 @@
 %token <s> FILE_EOF 800
 %token <s> PRINT_R 850
 %token <s> PRINT_L 851
-%token <s> STRING 900
+%token <s> STRING 751
+%token <s> PLUS_EQUALS 650
+%token <s> PLUS_PLUS 651
+%token <s> MINUS_EQUALS 652
+%token <s> MINUS_MINUS 653
 
 %left '-' '+' '*' '/' '%' ',' PRINT_L
 %left NEG
@@ -44,9 +48,34 @@ input:
 
 line:
     '\n'
-    | ID '=' exp '\n'   { comp c; c.name = $<s.lex>1; c.p.value = $<s.value>3;
+    | ID '=' exp '\n'   { comp c; c.name = $<s.lex>1; c.p.value = $<s.value>3;  /* PROBLEMS WITH workspace() and constants*/
                           searchNode(&c, 1);
+                          if (c.type == MA_CONST) {
+                              printf("TOOD: constant\n");
+                          }
                           _printPrompt(); } /*TODO: MOVE*/
+    | ID PLUS_EQUALS exp '\n'   { comp c; c.name = $<s.lex>1;
+                                  searchNode(&c, 0);
+                                  if (c.type == MA_CONST) {
+                                      printf("TODO: constant\n");
+                                  }
+                                  else {
+                                      c.p.value += $<s.value>3;
+                                      c.name = strdup(c.name);  // else it frees needed arrays
+                                      searchNode(&c, 1);
+                                  }
+                                  _printPrompt(); }
+    | ID MINUS_EQUALS exp '\n'  { comp c; c.name = $<s.lex>1;
+                                  searchNode(&c, 0);
+                                  if (c.type == MA_CONST) {
+                                      printf("TODO: constant\n");
+                                  }
+                                  else {
+                                      c.p.value -= $<s.value>3;
+                                      c.name = strdup(c.name);
+                                      searchNode(&c, 1);
+                                  }
+                                  _printPrompt(); }
     | exp '\n'          { _printPrompt(); }
     | exp PRINT_R '\n'  { fprintf(stdout, "%lf\n", $<s.value>1);
                           _printPrompt(); }
@@ -80,17 +109,19 @@ func:
     ID '(' ')'          { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
                           if (c.type == MA_COMMAND || c.type == MA_FUNC) {
-                            c.p.func();
+                              c.p.func();
                           } else {
-                            printf("NO FUNCTIONS OF THIS NAME\n");
-                            free(c.name);
+                              if (yyin == stdin) printError(ERR_NO_FUNC);
+                              else printErrorLine(ERR_NO_FUNC, yylineno-1);
+                              free(c.name);
                           } }
     | ID '(' STRING ')' { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
                           if (c.type == MA_COMMAND || c.type == MA_FUNC) {
                               c.p.func($<s.lex>3);
                           } else {
-                              printf("TODO: call errors\n");
+                              if (yyin == stdin) printError(ERR_NO_FUNC);
+                              else printErrorLine(ERR_NO_FUNC, yylineno-1);
                               free(c.name);
                           } }
     | ID '(' exp ')'    { comp c; c.name = $<s.lex>1;
@@ -99,7 +130,8 @@ func:
                               printf("b\n");
                               c.p.func($<s.value>3);
                           } else {
-                              printf("TODO: call errors\n");
+                              if (yyin == stdin) printError(ERR_NO_FUNC);
+                              else printErrorLine(ERR_NO_FUNC, yylineno-1);
                               free(c.name);
                           } }
     | ID '(' exp ',' exp ')'
@@ -111,7 +143,8 @@ type:
                           if (c.type == MA_ID || c.type == MA_CONST) {
                               $<s.value>$ = c.p.value;
                           } else {
-                              printf("TODO: UNDEF VAR\n");
+                              if (yyin == stdin) printError(ERR_NO_VAR);
+                              else printErrorLine(ERR_NO_VAR, yylineno-1);
                               free(c.name);
                           } }
     | NUM
@@ -121,7 +154,8 @@ type:
 
 void yyerror (char const *s) {
     printf("s: %s\n", s);
-    printErrorLine(ERR_SYNTAX, 0);
+    if (yyin == stdin) printError(ERR_SYNTAX);
+    else printErrorLine(ERR_SYNTAX, yylineno-1);
     // TODO: continue
 }
 

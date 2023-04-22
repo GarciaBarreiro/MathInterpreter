@@ -90,6 +90,7 @@ void ma_load(char *file) {  // TODO
     }
 
     free(file);
+    yylineno = 0;   // resets line counter
     yyin = fp;
 }
 

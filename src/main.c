@@ -53,14 +53,10 @@ int main(int argc, char *argv[]) {
         }
     } else yyin = stdin;
 
-    printf("optind == %d\n", optind);
-    printf("argc == %d\n", argc);
-
     initTree();
     short ret = 1;
     while (ret) {  // if ret == 0, YYACCEPT
         ret = yyparse();
-        printf("ret == %d\n", ret);
     }
     freeTree(); // in case it ends differently than with `exit()`
 
