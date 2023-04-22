@@ -15,7 +15,6 @@ struct node {
 
 struct node *T;
 
-// even though all keywords are defined, not all of them exist in regression.d
 comp kws[] = { {MA_COMMAND, "import", {&ma_import}},
                {MA_COMMAND, "exit", {&ma_exit}},
                {MA_COMMAND, "load", {&ma_load}},
@@ -116,7 +115,7 @@ void searchNode(comp *c, short insert) {
 void _printWorkspace(struct node *t, int type, short *found) {
     if (t->lesser) _printWorkspace(t->lesser, type, found);
 
-    if (type == t->el.type && type != MA_FUNC) {
+    if (type == t->el.type && (type != MA_FUNC && type != MA_LIB)) {
         if (!(*found)) {
             *found = 1;
             if (type == MA_CONST) printf("CONSTANTS:\n");
@@ -129,6 +128,14 @@ void _printWorkspace(struct node *t, int type, short *found) {
         if (!(*found)) {
             *found = 1;
             printf("IMPORTED FUNCTIONS:\n");
+        }
+        printf("    %-12s()\n", t->el.name);
+    }
+    
+    if (type == t->el.type && type == MA_LIB) {
+        if (!(*found)) {
+            *found = 1;
+            printf("IMPORTED LIBS:\n");
         }
         printf("    %-12s()\n", t->el.name);
     }

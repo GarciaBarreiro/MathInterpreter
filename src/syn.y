@@ -80,7 +80,6 @@ func:
     ID '(' ')'          { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
                           if (c.type == MA_COMMAND || c.type == MA_FUNC) {
-                            printf("aaaaaaaaaaaaa\n");
                             c.p.func();
                           } else {
                             printf("NO FUNCTIONS OF THIS NAME\n");
@@ -89,7 +88,6 @@ func:
     | ID '(' STRING ')' { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
                           if (c.type == MA_COMMAND || c.type == MA_FUNC) {
-                              printf("a\n");
                               c.p.func($<s.lex>3);
                           } else {
                               printf("TODO: call errors\n");

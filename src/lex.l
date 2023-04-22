@@ -7,6 +7,8 @@
     int num_lines = 0;
 
     // TODO: USE YYLINENO
+    double _bintod(char *str);
+    double _hextod(char *str);
 %}
 
 %option yylineno
@@ -28,15 +30,17 @@ SPACE           [ \t]+
 
 {DEC}  {
     yylval.s.value = strtod(yytext, NULL);
-    return(MA_DEC_NUM);
+    return(MA_NUM);
 }
 
 {BIN}  {
-    return(MA_BIN_NUM);
+    yylval.s.value = _bintod(yytext + 2);
+    return(MA_NUM);
 }
 
 {HEX}  {
-    return(MA_HEX_NUM);
+    yylval.s.value = _hextod(yytext + 2);
+    return(MA_NUM);
 }
 
 {LINE_COMMENT}  ;
@@ -145,3 +149,36 @@ SPACE           [ \t]+
 }
 
 %%
+
+double _bintod(char *str) {
+    double val = 0;
+    unsigned int pow = 1;
+    
+    for (short i = strlen(str); i > 0; i--) {
+        if (str[i-1] != '_') {
+            val += pow * (str[i-1] - 48);   // '0' == 48
+            pow *= 2;
+        }
+    }
+
+    return val;
+}
+
+double _hextod(char *str) {
+    double val = 0;
+    unsigned int pow = 1;
+    char c;
+
+    for (short i = strlen(str); i > 0; i--) {
+        c = str[i-1];
+        if (c >= '0' && c <= '9')
+            val += pow * (c - 48);
+        else if (c >= 'A' && c <= 'F')
+            val += pow * (c - 55);      // 'A' == 65
+        else if (c >= 'a' && c <= 'f')
+            val += pow * (c - 87);      // 'A' == 97
+        if (c != '_') pow *= 16;
+    }
+
+    return val;
+}

@@ -14,11 +14,9 @@
 #define MA_FUNC 701         // functions
 #define MA_CONST 702        // constants (PI, E)
 #define MA_COMMAND 703      // commands (internal functions)
+#define MA_LIB 704          // libs
 
-// num types
-#define MA_DEC_NUM 750
-#define MA_BIN_NUM 751
-#define MA_HEX_NUM 752
+#define MA_NUM 750
 
 #define MA_EOF 800
 
