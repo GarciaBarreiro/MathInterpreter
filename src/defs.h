@@ -20,7 +20,7 @@
 #define MA_PRINT_R 850      // ">>"
 #define MA_PRINT_L 851      // "<<"
 
-#define MA_PI 3.14159
-#define MA_E  2.71828
+#define MA_PI 3.141592
+#define MA_E  2.718281
 
 #endif // DEFS_H

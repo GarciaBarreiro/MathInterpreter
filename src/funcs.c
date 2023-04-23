@@ -20,7 +20,6 @@ double ma_clean() {
 }
 
 double ma_exit() {
-    // TODO: free everything
     freeTree();
     yylex_destroy();
     exit(0);
@@ -51,9 +50,8 @@ double ma_import(char *header) {      // either full path or relative
     void *handle = dlopen(header, RTLD_LAZY);
 
     if (!handle) {
-        printf("TODO: HEADER NOT FOUND\n");
-        printf("CALL ERRORS.H\n");
-        printf("%s\n", dlerror());
+        if (yyin == stdin) printError(ERR_NO_LIB);
+        else printErrorLine(ERR_NO_LIB, yylineno-1);
         free(header);
         return 1;
     }
@@ -75,12 +73,13 @@ double ma_import(char *header) {      // either full path or relative
     return 0;
 }
 
-double ma_load(char *file) {  // TODO
+double ma_load(char *file) {
     FILE *fp;
     char *ext = strrchr(file, '.');
 
-    if (!ext || strcmp(ext, ".ma")) {
-        printError(ERR_BAD_EXTENSION);
+    if (!ext || strcmp(ext, ".mi")) {
+        if (yyin == stdin) printError(ERR_BAD_EXTENSION);
+        else printErrorLine(ERR_BAD_EXTENSION, yylineno-1);
         return 1;
     }
 
@@ -93,6 +92,11 @@ double ma_load(char *file) {  // TODO
 
     free(file);
     yylineno = 0;   // resets line counter
+
+    // changing buffer this way is incorrect
+    // functions described at chapter 11 (Multiple Input Buffers) on the flex manual should be used
+    // however, bison returns syntax errors
+    // and parses incorrectly
     yyin = fp;
     return 0;
 }

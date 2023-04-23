@@ -4,7 +4,7 @@ HEADER_FILES_DIR = ./src/
 
 INCLUDES = -I $(HEADER_FILES_DIR)
 
-OUTPUT = mathA
+OUTPUT = mathI
 
 LIB_HEADERS = lex.yy.h syn.tab.h defs.h funcs.h errors.h tree.h
 

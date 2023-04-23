@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "errors.h"
@@ -13,28 +14,14 @@ void printError(int error) {
             fprintf(stderr, "       Use `-h` for help\n");
             exit(1);
             break;
-        case ERR_NO_INPUT:
-            fprintf(stderr, "%sERROR%s No input file\n", RED, RESET);      // don't need it
-            exit(1);
-            break;
         case ERR_BAD_FILE:
-            fprintf(stderr, "%sERROR%s Unable to read file, going back to prompt mode\n", RED, RESET);
+            fprintf(stderr, "%sERROR%s Unable to read file\n", RED, RESET);
             break;
         case ERR_BAD_EXTENSION:
-            fprintf(stderr, "%sERROR%s File needs to have a MA extension, going back to prompt mode\n", RED, RESET);
-            break;
-        case ERR_BAD_MALLOC:
-            fprintf(stderr, "%sINTERNAL ERROR%s `malloc` has failed, aborting...\n", RED, RESET);
-            freeTree();
-            exit(2);
-            break;
-        case ERR_BAD_REALLOC:
-            fprintf(stderr, "%sINTERNAL ERROR%s `realloc` has failed, aborting...\n", RED, RESET);
-            freeTree();
-            exit(2);
+            fprintf(stderr, "%sERROR%s File needs to have a MI extension\n", RED, RESET);
             break;
         case ERR_SYNTAX:
-            fprintf(stderr, "%sSYNTAX ERROR%s\n", RED, RESET);
+            fprintf(stderr, "%sSYNTAX ERROR%s Unknown. Check statement\n", RED, RESET);
             break;
         case ERR_NO_VAR:
             fprintf(stderr, "%sSYNTAX ERROR%s Undefined variable\n", RED, RESET);
@@ -44,6 +31,12 @@ void printError(int error) {
             break;
         case ERR_ASSIGN_CONST:
             fprintf(stderr, "%sSYNTAX ERROR%s Can't assign a new value to a constant\n", RED, RESET);
+            break;
+        case ERR_NO_LIB:
+            fprintf(stderr, "%sSYNTAX ERROR%s Can't load library\n   Error: %s\n", RED, RESET, dlerror());
+            break;
+        case ERR_DIV_0:
+            fprintf(stderr, "%sSYNTAX ERROR%s Divison by 0\n", RED, RESET);
             break;
     }
 }
@@ -56,8 +49,11 @@ void printErrorLine(int error, int line_number) {
         case ERR_NESTED_COMMENT:
             fprintf(stderr, "%sLEXICAL ERROR%s Nested comment not closed at line %d\n", RED, RESET, line_number);
             break;
+        case ERR_BAD_EXTENSION:
+            fprintf(stderr, "%sERROR%s File needs to have a MI extension, at line %d\n", RED, RESET, line_number);
+            break;
         case ERR_SYNTAX:
-            fprintf(stderr, "%sSYNTAX ERROR%s at line %d\n", RED, RESET, line_number);
+            fprintf(stderr, "%sSYNTAX ERROR%s Unknown. Check statement at line %d\n", RED, RESET, line_number);
             break;
         case ERR_NO_VAR:
             fprintf(stderr, "%sSYNTAX ERROR%s Undefined variable at line %d\n", RED, RESET, line_number);
@@ -67,6 +63,12 @@ void printErrorLine(int error, int line_number) {
             break;
         case ERR_ASSIGN_CONST:
             fprintf(stderr, "%sSYNTAX ERROR%s Can't assign a new value to a constant, at line %d\n", RED, RESET, line_number);
+            break;
+        case ERR_NO_LIB:
+            fprintf(stderr, "%sSYNTAX ERROR%s Can't load library at line %d\n   Error: %s\n", RED, RESET, line_number, dlerror());
+            break;
+        case ERR_DIV_0:
+            fprintf(stderr, "%sSYNTAX ERROR%s Divison by 0 at line %d\n", RED, RESET, line_number);
             break;
     }
 }

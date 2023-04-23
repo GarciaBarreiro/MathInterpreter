@@ -4,7 +4,6 @@
     #include "defs.h"
     #include "syn.tab.h"
 
-    // TODO: USE YYLINENO
     double _bintod(char *str);
     double _hextod(char *str);
 %}
@@ -121,7 +120,6 @@ SPACE           [ \t]+
 
     yyrestart(stdin);
 
-    /* TODO: CALL LATER FROM syn.y*/
     /*yylex_destroy();
     yy_init = 1;*/
     yylineno = 0;

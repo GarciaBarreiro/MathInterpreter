@@ -13,11 +13,11 @@
 
 void _printHelp() {
     printf("Usage:\n"
-        "    ./mathA [-i file] [-o file]\n\n"
-        "Options:\n"
-        "    -h        Shows this screen\n"
-        "    -i FILE   Reads input from FILE\n"
-        "Inside the prompt, call `help()` for help with functions\n");
+           "    ./mathI [-i file]\n\n"
+           "Options:\n"
+           "    -h        Shows this screen\n"
+           "    -i FILE   Reads input from FILE\n\n"
+           "Inside the prompt, call `help()` for help with functions\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -37,8 +37,7 @@ int main(int argc, char *argv[]) {
                 _printHelp();
                 exit(1);
             default:
-                printf("ERROR: Use `-h` for help\n");
-                exit(1);
+                printError(ERR_BAD_ARGS);
         }
     }
 
@@ -46,7 +45,7 @@ int main(int argc, char *argv[]) {
 
     if (input) {
         ext = strrchr(input, '.');
-        if (!ext || strcmp(ext, ".ma")) {
+        if (!ext || strcmp(ext, ".mi")) {
             printError(ERR_BAD_EXTENSION);
         } else {
             yyin = fopen(input, "r");
@@ -54,6 +53,7 @@ int main(int argc, char *argv[]) {
     } else yyin = stdin;
 
     initTree();
+
     short ret = 1;
     while (ret) {  // if ret == 0, YYACCEPT
         ret = yyparse();

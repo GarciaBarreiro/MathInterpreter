@@ -34,6 +34,10 @@ void _printTree(struct node *t) {
     
 }
 
+/*
+ * CORE FUNCTIONS
+ */
+
 struct node _createNode(comp kw) {
     struct node n;
     n.el = kw;
@@ -103,8 +107,6 @@ void searchNode(comp *c, short insert) {
     if (c->type < MA_LIB || c->type > MA_LIB)
         c->type = 0;
 
-    // _printTree(T);
-
     if (!cmp) {
         free(c->name);
         if (T->el.type == MA_ID && insert) T->el.p = c->p;
@@ -115,6 +117,10 @@ void searchNode(comp *c, short insert) {
         if (T->greater) _searchNode(T->greater, c, insert);
     }
 }
+
+/*
+ * MATH INTERPRETER-SPECIFIC FUNCTIONS
+ */
 
 void _printWorkspace(struct node *t, int type, short *found) {
     if (t->lesser) _printWorkspace(t->lesser, type, found);
