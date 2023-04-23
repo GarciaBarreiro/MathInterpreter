@@ -2,6 +2,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <math.h>
+    #include <dlfcn.h>
 
     #include "lex.yy.h"
     #include "errors.h"
@@ -19,20 +20,25 @@
     } s;
 }
 
-%token <s> NUM 750
+%token <s> PLUS_EQUALS 650
+%token <s> MINUS_EQUALS 651
+
 %token <s> ID 700
+
+%token <s> NUM 750
+%token <s> STRING 751
+
 %token <s> FILE_EOF 800
+
 %token <s> PRINT_R 850
 %token <s> PRINT_L 851
-%token <s> STRING 751
-%token <s> PLUS_EQUALS 650
-%token <s> PLUS_PLUS 651
-%token <s> MINUS_EQUALS 652
-%token <s> MINUS_MINUS 653
 
-%left '-' '+' '*' '/' '%' ',' PRINT_L
-%left NEG
-%right '^' '(' '=' PRINT_R
+%precedence '='
+%left '-' '+'
+%left '*' '/'
+%left '%' PRINT_L
+%precedence NEG
+%right '^' PRINT_R
 
 %type <s> exp
 %type <s> type
@@ -48,34 +54,7 @@ input:
 
 line:
     '\n'
-    | ID '=' exp '\n'   { comp c; c.name = $<s.lex>1; c.p.value = $<s.value>3;  /* PROBLEMS WITH workspace() and constants*/
-                          searchNode(&c, 1);
-                          if (c.type == MA_CONST) {
-                              printf("TOOD: constant\n");
-                          }
-                          _printPrompt(); } /*TODO: MOVE*/
-    | ID PLUS_EQUALS exp '\n'   { comp c; c.name = $<s.lex>1;
-                                  searchNode(&c, 0);
-                                  if (c.type == MA_CONST) {
-                                      printf("TODO: constant\n");
-                                  }
-                                  else {
-                                      c.p.value += $<s.value>3;
-                                      c.name = strdup(c.name);  // else it frees needed arrays
-                                      searchNode(&c, 1);
-                                  }
-                                  _printPrompt(); }
-    | ID MINUS_EQUALS exp '\n'  { comp c; c.name = $<s.lex>1;
-                                  searchNode(&c, 0);
-                                  if (c.type == MA_CONST) {
-                                      printf("TODO: constant\n");
-                                  }
-                                  else {
-                                      c.p.value -= $<s.value>3;
-                                      c.name = strdup(c.name);
-                                      searchNode(&c, 1);
-                                  }
-                                  _printPrompt(); }
+    | assign '\n'       { _printPrompt(); }
     | exp '\n'          { _printPrompt(); }
     | exp PRINT_R '\n'  { fprintf(stdout, "%lf\n", $<s.value>1);
                           _printPrompt(); }
@@ -97,18 +76,18 @@ exp:
     | exp '-' exp       { $<s.value>$ = $<s.value>1 - $<s.value>3; }
     | exp '*' exp       { $<s.value>$ = $<s.value>1 * $<s.value>3; }
     | exp '/' exp       { $<s.value>$ = $<s.value>1 / $<s.value>3; }
-    | exp '^' exp       { $<s.value>$ = pow($<s.value>1, $<s.value>3); }
-    | exp '%' exp       { $<s.value>$ = (long) $<s.value>1 % (long) $<s.value>3; }
     | '-' exp %prec NEG { $<s.value>$ = - $<s.value>2; }   /*???*/
     | '+' exp %prec NEG { $<s.value>$ = $<s.value>2; }
+    | exp '^' exp       { $<s.value>$ = pow($<s.value>1, $<s.value>3); }
+    | exp '%' exp       { $<s.value>$ = (long) $<s.value>1 % (long) $<s.value>3; }
     | '(' exp ')'       { $<s.value>$ = $<s.value>2; }
-    | func
+    | func              { $<s.value>$ = $<s.value>1; }
     ;
 
 func:
     ID '(' ')'          { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
-                          if (c.type == MA_COMMAND || c.type == MA_FUNC) {
+                          if (c.type == MA_COMMAND) {
                               c.p.func();
                           } else {
                               if (yyin == stdin) printError(ERR_NO_FUNC);
@@ -117,7 +96,7 @@ func:
                           } }
     | ID '(' STRING ')' { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
-                          if (c.type == MA_COMMAND || c.type == MA_FUNC) {
+                          if (c.type == MA_COMMAND) {
                               c.p.func($<s.lex>3);
                           } else {
                               if (yyin == stdin) printError(ERR_NO_FUNC);
@@ -126,15 +105,44 @@ func:
                           } }
     | ID '(' exp ')'    { comp c; c.name = $<s.lex>1;
                           searchNode(&c, 0);
-                          if (c.type == MA_COMMAND || c.type == MA_FUNC) {
+                          if (c.type == MA_COMMAND) {
                               printf("b\n");
-                              c.p.func($<s.value>3);
+                              $<s.value>$ = c.p.func($<s.value>3);
                           } else {
                               if (yyin == stdin) printError(ERR_NO_FUNC);
                               else printErrorLine(ERR_NO_FUNC, yylineno-1);
                               free(c.name);
                           } }
-    | ID '(' exp ',' exp ')'
+    | ID '.' ID '(' exp ')' { comp c; c.name = $<s.lex>1;
+                              searchNode(&c, 0);
+                              if (c.type == MA_LIB) {
+                                  printf("lib!!\n");
+                                  double (*func)() = dlsym(c.p.handle, $<s.lex>3);
+                                  if (func) {
+                                      printf("func!!\n");
+                                      $<s.value>$ = func($<s.value>5);
+                                      free($<s.lex>3);
+                                  } else {
+                                      printf("not func :(\n");
+                                  }
+                              } else {
+                                  printf("error\n");
+                              } }
+    | ID '.' ID '(' exp ',' exp ')' { comp c; c.name = $<s.lex>1;
+                                      searchNode(&c, 0);
+                                      if (c.type == MA_LIB) {
+                                          printf("lib!!\n");
+                                          double (*func)() = dlsym(c.p.handle, $<s.lex>3);
+                                          if (func) {
+                                              printf("func!!\n");
+                                              $<s.value>$ = func($<s.value>5, $<s.value>7);
+                                              free($<s.lex>3);
+                                          } else {
+                                              printf("not func :(\n");
+                                          }
+                                      } else {
+                                          printf("error\n");
+                                      } }
     ;
 
 type:
@@ -145,9 +153,38 @@ type:
                           } else {
                               if (yyin == stdin) printError(ERR_NO_VAR);
                               else printErrorLine(ERR_NO_VAR, yylineno-1);
-                              free(c.name);
+                              if (c.type != MA_LIB && c.type != MA_COMMAND) free(c.name);
                           } }
     | NUM
+    ;
+
+assign:
+    ID '=' exp              { comp c; c.name = $<s.lex>1; c.p.value = $<s.value>3;
+                              searchNode(&c, 1);
+                              if (c.type == MA_CONST) {
+                                  if (yyin == stdin) printError(ERR_ASSIGN_CONST);
+                                  else printErrorLine(ERR_ASSIGN_CONST, yylineno-1);
+                              } }
+    | ID PLUS_EQUALS exp    { comp c; c.name = $<s.lex>1;
+                              searchNode(&c, 0);
+                              if (c.type == MA_CONST) {
+                                  if (yyin == stdin) printError(ERR_ASSIGN_CONST);
+                                  else printErrorLine(ERR_ASSIGN_CONST, yylineno-1);
+                              } else {
+                                  c.p.value += $<s.value>3;
+                                  c.name = strdup(c.name);  // else it frees needed arrays
+                                  searchNode(&c, 1);
+                              } }
+    | ID MINUS_EQUALS exp   { comp c; c.name = $<s.lex>1;
+                              searchNode(&c, 0);
+                              if (c.type == MA_CONST) {
+                                  if (yyin == stdin) printError(ERR_ASSIGN_CONST);
+                                  else printErrorLine(ERR_ASSIGN_CONST, yylineno-1);
+                              } else {
+                                  c.p.value -= $<s.value>3;
+                                  c.name = strdup(c.name);
+                                  searchNode(&c, 1);
+                              } }
     ;
 
 %%

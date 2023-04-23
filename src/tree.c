@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +24,8 @@ comp kws[] = { {MA_COMMAND, "import", {&ma_import}},
                {MA_COMMAND, "workspace", {&ma_workspace}},
                {MA_COMMAND, "clean", {&ma_clean}},
                {MA_CONST, "PI", {.value = MA_PI}},
-               {MA_CONST, "E", {.value = MA_E}}};
+               {MA_CONST, "E", {.value = MA_E}}
+             };
 
 void _printTree(struct node *t) {
     if (t->lesser) _printTree(t->lesser);
@@ -46,7 +48,8 @@ void _freeTree(struct node *tr) {
         _freeTree(tr->lesser);
     if (tr->greater)
         _freeTree(tr->greater);
-    if (tr->el.type == MA_ID) free(tr->el.name);    /* TODO: or imported func */
+    if (tr->el.type == MA_ID || tr->el.type == MA_LIB) free(tr->el.name);    /* TODO: or imported func */
+    if (tr->el.type == MA_LIB) dlclose(tr->el.p.handle);
     free(tr);
     tr = NULL;
 }
@@ -59,13 +62,13 @@ void _insertNode(struct node **tr, comp *c) {
     (*tr)->greater = NULL;
 }
 
-// if not found, inserted
+// if not found, insert
 void _searchNode(struct node *tr, comp *c, short insert) {
     int cmp = strcmp(c->name, tr->el.name);
 
     if (!cmp) {
         free(c->name);
-        if (tr->el.type == MA_ID) tr->el.p = c->p;
+        if (tr->el.type == MA_ID && insert) tr->el.p = c->p;
         *c = tr->el;
     } else if (cmp < 0) {
         if (tr->lesser) _searchNode(tr->lesser, c, insert);
@@ -97,13 +100,14 @@ void freeTree() {
 
 void searchNode(comp *c, short insert) {
     int cmp = strcmp(c->name, T->el.name);
-    c->type = 0;
+    if (c->type < MA_LIB || c->type > MA_LIB)
+        c->type = 0;
 
     // _printTree(T);
 
     if (!cmp) {
         free(c->name);
-        if (T->el.type == MA_ID) T->el.p = c->p;
+        if (T->el.type == MA_ID && insert) T->el.p = c->p;
         *c = T->el;
     } else if (cmp < 0) {
         if (T->lesser) _searchNode(T->lesser, c, insert);
@@ -115,7 +119,7 @@ void searchNode(comp *c, short insert) {
 void _printWorkspace(struct node *t, int type, short *found) {
     if (t->lesser) _printWorkspace(t->lesser, type, found);
 
-    if (type == t->el.type && (type != MA_FUNC && type != MA_LIB)) {
+    if (t->el.type == type && (type != MA_LIB && type != MA_COMMAND)) {
         if (!(*found)) {
             *found = 1;
             if (type == MA_CONST) printf("CONSTANTS:\n");
@@ -124,20 +128,12 @@ void _printWorkspace(struct node *t, int type, short *found) {
         printf("    %-12s == %.6lf\n", t->el.name, t->el.p.value);
     }
 
-    if (type == t->el.type && type == MA_FUNC) {
-        if (!(*found)) {
-            *found = 1;
-            printf("IMPORTED FUNCTIONS:\n");
-        }
-        printf("    %-12s()\n", t->el.name);
-    }
-    
-    if (type == t->el.type && type == MA_LIB) {
+    if (t->el.type == type && type == MA_LIB) {
         if (!(*found)) {
             *found = 1;
             printf("IMPORTED LIBS:\n");
         }
-        printf("    %-12s()\n", t->el.name);
+        printf("    %s\n", t->el.name);
     }
     
     if (t->greater) _printWorkspace(t->greater, type, found);
@@ -145,7 +141,7 @@ void _printWorkspace(struct node *t, int type, short *found) {
 
 void printWorkspace() {
     short found = 0;
-    _printWorkspace(T, MA_FUNC, &found);
+    _printWorkspace(T, MA_LIB, &found);
     found = 0;
     _printWorkspace(T, MA_ID, &found);
     found = 0;
@@ -157,8 +153,9 @@ short _cleanWorkspace(struct node *tr) {
         if (_cleanWorkspace(tr->lesser)) tr->lesser = NULL;
     if (tr->greater)
         if (_cleanWorkspace(tr->greater)) tr->greater = NULL;
-    if (tr->el.type == MA_ID) {
-        free(tr->el.name);    /* TODO: or imported func */
+    if (tr->el.type == MA_ID || tr->el.type == MA_LIB) {
+        free(tr->el.name);
+        if (tr->el.type == MA_LIB) dlclose(tr->el.p.handle);
         free(tr);
         tr = NULL;
         return 1;

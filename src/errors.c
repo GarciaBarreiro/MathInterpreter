@@ -42,6 +42,9 @@ void printError(int error) {
         case ERR_NO_FUNC:
             fprintf(stderr, "%sSYNTAX ERROR%s Undefined function\n", RED, RESET);
             break;
+        case ERR_ASSIGN_CONST:
+            fprintf(stderr, "%sSYNTAX ERROR%s Can't assign a new value to a constant\n", RED, RESET);
+            break;
     }
 }
 
@@ -61,6 +64,9 @@ void printErrorLine(int error, int line_number) {
             break;
         case ERR_NO_FUNC:
             fprintf(stderr, "%sSYNTAX ERROR%s Undefined function at line %d\n", RED, RESET, line_number);
+            break;
+        case ERR_ASSIGN_CONST:
+            fprintf(stderr, "%sSYNTAX ERROR%s Can't assign a new value to a constant, at line %d\n", RED, RESET, line_number);
             break;
     }
 }

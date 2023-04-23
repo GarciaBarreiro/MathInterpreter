@@ -77,16 +77,8 @@ SPACE           [ \t]+
     return(MA_PLUS_EQUALS);
 }
 
-"++"    {
-    return(MA_PLUS_PLUS);
-}
-
 "-="    {
     return(MA_MINUS_EQUALS);
-}
-
-"--"    {
-    return(MA_MINUS_MINUS);
 }
 
 ">>"    {

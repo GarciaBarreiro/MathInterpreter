@@ -2,7 +2,8 @@
 #define TABLE_H
 
 union ptr { // TODO: change
-    void (*func)();
+    double (*func)();
+    void *handle;
     double value;
 };
 

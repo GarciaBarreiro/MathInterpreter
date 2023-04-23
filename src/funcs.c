@@ -9,22 +9,24 @@
 #include "tree.h"
 #include "errors.h"
 
-void ma_clear() {
+double ma_clear() {
     system("clear");
+    return 0;
 }
 
-void ma_clean() {
+double ma_clean() {
     cleanWorkspace();
+    return 0;
 }
 
-void ma_exit() {
+double ma_exit() {
     // TODO: free everything
     freeTree();
     yylex_destroy();
     exit(0);
 }
 
-void ma_help() {
+double ma_help() {
     printf("SYSTEM FUNCTIONS\n"
             "   clear()             clears screen\n"
             "   clean()             cleans workspace\n"
@@ -34,13 +36,18 @@ void ma_help() {
             "   load(file)          loads and executes file\n"
             "   workspace()         prints workspace (currently initialized variables)\n"
             "MATH FUNCTIONS\n"
-            "   TODO\n"
+            "   none :)\n"
+            "   import `libm` for them\n"
+            "   example:            import(\"libm.so.6\")\n"
+            "   and then call them using `libm.[function]([param])`\n"
+            "   example:            libm.sqrt(4)\n"
             );
+    return 0;
 }
 
-void ma_import(char *header) {      // either full path or relative
-    printf("holaaaaaaaa %s\n", header);
+double ma_import(char *header) {      // either full path or relative
     char *name;
+    comp c;
     void *handle = dlopen(header, RTLD_LAZY);
 
     if (!handle) {
@@ -48,52 +55,49 @@ void ma_import(char *header) {      // either full path or relative
         printf("CALL ERRORS.H\n");
         printf("%s\n", dlerror());
         free(header);
-        return;
+        return 1;
     }
 
     if ((name = strrchr(header, '/')) != NULL) {
-        name = name + 1;
-        printf("NAME == %s\n", name);
-    }   // TODO
+        name = name + 1;    // name pointed to last '/' 
+    } else name = header;
 
-    name = strtok(name, ".");
-    printf("NAME == %s\n", name);
+    name = strdup(strtok(name, "."));   // first string before '.'
+
+    printf("Imported library as %s\n", name);
 
     free(header);
 
-    comp c = {MA_LIB, name};
+    c.type = MA_LIB; c.name = name; c.p.handle = handle;
 
     searchNode(&c, 1);
 
-    // basicamente:
-    // abrir libraría e gardala na árbore
-    // logo, indicar nome da libraría e nome da función
-    // e buscar a función na libraría
-    // ou non indicar libraría e ir simplemente iterando entre as abertas
-    // ata que cheguemos a que contén a función que buscamos
+    return 0;
 }
 
-void ma_load(char *file) {  // TODO
+double ma_load(char *file) {  // TODO
     FILE *fp;
     char *ext = strrchr(file, '.');
 
     if (!ext || strcmp(ext, ".ma")) {
         printError(ERR_BAD_EXTENSION);
-        return;
+        return 1;
     }
 
     fp = fopen(file, "r");
 
     if (!fp) {
         printError(ERR_BAD_FILE);
-        return;
+        return 1;
     }
 
     free(file);
     yylineno = 0;   // resets line counter
     yyin = fp;
+    return 0;
 }
 
-void ma_workspace() {
+double ma_workspace() {
     printWorkspace();
+    return 0;
 }

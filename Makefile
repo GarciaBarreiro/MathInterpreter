@@ -23,7 +23,7 @@ src/syn.tab.%: src/syn.y
 $(OUTPUT): $(OBJS)
 	$(CC)    -c -o src/syn.tab.o src/syn.tab.c
 	$(CC)    -c -o src/lex.yy.o src/lex.yy.c
-	$(CC) -o $(OUTPUT) $(OBJS) -lm
+	$(CC) -o $(OUTPUT) $(OBJS) -lm -ldl
 	rm src/*.o
 	rm -f src/lex.yy.*
 	rm -f src/syn.tab.*

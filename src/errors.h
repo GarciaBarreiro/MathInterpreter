@@ -15,6 +15,7 @@ void printError(int error);
 #define ERR_SYNTAX 8            // byson calls yyerror()
 #define ERR_NO_VAR 9
 #define ERR_NO_FUNC 10
+#define ERR_ASSIGN_CONST 11
 
 void printErrorLine(int error, int line_number);
 
