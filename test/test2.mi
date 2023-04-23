@@ -1,0 +1,19 @@
+// we can import libraries
+
+import("libm.so.6")
+
+// and use them to access new functions
+
+libm.sqrt(4) >>
+
+// we can close open libraries
+
+clean()     // (undefines variables too)
+
+// and we can import them with a full path
+
+import("/lib/x86_64-linux-gnu/libm.so.6")   // path and name can change
+
+// and print to an output file
+
+libm.sqrt(16) >> "test/output"

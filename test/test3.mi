@@ -1,0 +1,18 @@
+// there are some built-in commands
+help()
+
+// and also the ability to use both binary and hexadecimal numbers
+
+0b1010 >>
+
+0B10 + 0b1 >>
+
+0x1a >>
+
+0XA + 0x2 >>
+
+// keep in mind that loading a file inside a file
+// doesn't work correctly
+load ("test/test1.mi")
+
+1 + 4 >>

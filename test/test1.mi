@@ -1,0 +1,31 @@
+clean()
+a           // this returns SYNTAX ERROR (Undef var)
+
+/*
+    printing is done using << or >>, as seen below
+*/
+
+<< 1 + 1
+(1 + 23) * 12 - 21 / (21 ^ 2) >>
+
+<< 2 ^ 2 ^ 2 ^ 2
+
+/+
+    there's also support for variables
+    /+ (and nested comments) +/
++/
+
+a = 12 + 2
+
+a >>
+
+// and also both += and -=
+
+a += 1
+
+<< a
+
+/* newlines are correctly counted, even with comments
+   as seen with the syntax error below */
+
+b
